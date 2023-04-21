@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace CurrencyReader.Service
 {
@@ -10,6 +11,10 @@ namespace CurrencyReader.Service
             using IHost host = Host.CreateDefaultBuilder(args)
             .ConfigureServices(services =>
             {
+                services.AddLogging(x =>
+                {
+                    x.AddConsole();
+                });
                 services.AddHostedService<HostedService>();
                 services.AddSingleton<CnbCzService>();
                 services.AddSingleton<Parser>();

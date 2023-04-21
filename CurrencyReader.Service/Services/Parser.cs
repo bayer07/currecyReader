@@ -1,3 +1,5 @@
+using System.Globalization;
+
 public class Parser
 {
     private const string RowSeparator = "\n";
@@ -42,7 +44,7 @@ public class Parser
 
             try
             {
-                DateOnly date = DateOnly.ParseExact(first, DateFormat);
+                DateTime date = DateTime.ParseExact(first, DateFormat, CultureInfo.InvariantCulture);
                 for (int j = 1; j < cells.Length; j++)
                 {
                     var currency = currencies[j - 1];
