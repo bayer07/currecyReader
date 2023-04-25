@@ -68,7 +68,7 @@ public class CurrencyController : ControllerBase
             using (var repository = new ExchangeRepository())
             {
                 var result = repository.CurrencyRates
-                    .Where(d => d.CurrencyId == currencyId && d.Date > startDate && d.Date < endDate)
+                    .Where(d => d.CurrencyId == currencyId && d.Date >= startDate && d.Date <= endDate)
                     .ToList();
                 return result;
             }

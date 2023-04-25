@@ -14,7 +14,11 @@ export class FetchDataComponent {
   public selectedCurrency?: SelectCurrencyModel;
   private baseUrl: string;
   public currency?: Currency;
-
+  datePicker: FormControl = new FormControl()
+  range = new FormGroup({
+    start: new FormControl<Date | null>(null),
+    end: new FormControl<Date | null>(null),
+  })
   constructor(private http: HttpClient, @Inject('BASE_URL') baseUrl: string, private datePipe: DatePipe) {
     this.baseUrl = baseUrl;
     http.get<Currency[]>(baseUrl + 'currency').subscribe(result => {
@@ -24,6 +28,17 @@ export class FetchDataComponent {
   onSelectCurrency() {
     if (this.currency === null) {
       return;
+    }
+
+    if (this.range !== null) {
+      this.range = new FormGroup({
+        start: new FormControl<Date | null>(null),
+        end: new FormControl<Date | null>(null),
+      })
+    }
+
+    if (this.rates !== null) {
+      this.rates = [];
     }
 
     this.http.get<SelectCurrencyModel>(this.baseUrl + 'currency/' + this.currency?.id).subscribe(result => {
@@ -40,11 +55,6 @@ export class FetchDataComponent {
       this.rates = result;
     }, error => console.error(error));
   }
-  datePicker: FormControl = new FormControl()
-  range = new FormGroup({
-    start: new FormControl<Date | null>(null),
-    end: new FormControl<Date | null>(null),
-  })
 }
 interface Currency {
   name: string;

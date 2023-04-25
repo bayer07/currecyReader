@@ -26,11 +26,11 @@ public class HostedService : IHostedService
         {
             try
             {
-                for (int year = 2019; year < 2021; year++)
-                {
-                    await ReadRatesByYear(year);
-                }
-                //await ReadRatesByYear(DateTime.Now.Year);
+                //for (int year = 2009; year < 2021; year++)
+                //{
+                //    await ReadRatesByYear(year);
+                //}
+                await ReadRatesByYear(DateTime.Now.Year);
             }
             catch (Exception e)
             {
@@ -47,7 +47,7 @@ public class HostedService : IHostedService
     {
         string response = await _currencyService.SendRequestByYear(year);
         var rates = _parser.FillCurrencyRateByYearFromText(response);
-        //rates = rates.Where(x => x.Date > DateTime.Now.Date.AddDays(-1)); // Comment for full year processing
+        rates = rates.Where(x => x.Date == DateTime.Now.Date.AddDays(-1));
         using (var repository = new ExchangeRepository())
         {
             foreach (CurrencyRate rate in rates)
