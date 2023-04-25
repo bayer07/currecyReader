@@ -1,0 +1,36 @@
+<h1 id="tableLabel">Czech Koruna Exchange</h1>
+
+<p>This component demonstrates fetching data from the server.</p>
+
+<p *ngIf="!currencies?.length"><em>Loading...</em></p>
+
+<select class="custom-select mb-3"
+        [(ngModel)]="currency"
+        (change)="onSelectCurrency()"
+        *ngIf="currencies.length">
+  <option value="">Choose Currency</option>
+  <option *ngFor="let currency of currencies" [value]="currency.id" [ngValue]="currency">
+    {{ currency.name }}
+  </option>
+</select>
+
+<div>
+  <mat-form-field appearance="fill" *ngIf="selectedCurrency" onchange="onDatePick($event)">
+    <mat-label>Enter a date range</mat-label>
+    <mat-date-range-input [formGroup]="range" [rangePicker]="picker">
+      <input matStartDate #dateRangeStart formControlName="start" placeholder="Start date">
+      <input matEndDate #dateRangeEnd formControlName="end" placeholder="End date" (dateChange)="onDatePick(dateRangeStart, dateRangeEnd)">
+    </mat-date-range-input>
+    <mat-hint>MM-DD-YYYY – MM-DD-YYYY</mat-hint>
+    <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+    <mat-date-range-picker #picker></mat-date-range-picker>
+  </mat-form-field>
+</div>
+
+<mat-list *ngIf="rates && currency">
+  <mat-list-item *ngFor="let rate of rates">
+    <p matListItemLine>
+      <span>{{rate.date | date:'YYYY:MM:dd'}} 1 CZK = {{currency.amount}}{{currency.name}} costs {{rate.price}}</span>
+    </p>
+  </mat-list-item>
+</mat-list>
