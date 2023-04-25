@@ -1,4 +1,5 @@
 using CurrencyReader.Data;
+using CurrencyReader.Data.Repositories;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
@@ -25,14 +26,11 @@ public class HostedService : IHostedService
         {
             try
             {
-                //List<Task> tasks = new List<Task>();
-                //for (int year = 2019; year < 2021; year++)
-                //{
-                //    Task task = ReadRatesByYear(year);
-                //    tasks.Add(task);
-                //}
-                //Task.WaitAll(tasks.ToArray());
-                await ReadRatesByYear(DateTime.Now.Year);
+                for (int year = 2019; year < 2021; year++)
+                {
+                    await ReadRatesByYear(year);
+                }
+                //await ReadRatesByYear(DateTime.Now.Year);
             }
             catch (Exception e)
             {
@@ -50,36 +48,37 @@ public class HostedService : IHostedService
         string response = await _currencyService.SendRequestByYear(year);
         var rates = _parser.FillCurrencyRateByYearFromText(response);
         //rates = rates.Where(x => x.Date > DateTime.Now.Date.AddDays(-1)); // Comment for full year processing
-        using (var db = new ApplicationContext())
+        using (var repository = new ExchangeRepository())
         {
             foreach (CurrencyRate rate in rates)
             {
-                Currency? currency = db.Currencies.SingleOrDefault(x =>
+                Currency? currency = repository.Currencies.SingleOrDefault(x =>
                     rate.Currency.Name == x.Name &&
                     rate.Currency.Amount == x.Amount);
                 if (currency == null)
                 {
                     currency = rate.Currency;
-                    db.Currencies.Add(currency);
-                    await db.SaveChangesAsync();
+                    await repository.Add(currency);
+                    await repository.SaveAsync();
                     _logger.LogInformation($"Currency Added:{currency}");
                 }
 
-                CurrencyRate currencyRate = db.CurrencyRates.SingleOrDefault(x =>
+                CurrencyRate currencyRate = repository.CurrencyRates.SingleOrDefault(x =>
                 rate.Date == x.Date &&
                 currency.Id == x.CurrencyId);
                 if (currencyRate == null)
                 {
-                    rate.CurrencyId = currency.Id;
                     currencyRate = rate;
-                    db.CurrencyRates.Add(currencyRate);
-                    await db.SaveChangesAsync();
+                    currencyRate.CurrencyId = currency.Id;
+                    currencyRate.Currency = null;
+                    await repository.Add(currencyRate);
+                    await repository.SaveAsync();
                     _logger.LogInformation($"CurrencyRate Added:{currencyRate}");
                 }
                 else if (currencyRate.Price != rate.Price)
                 {
                     currencyRate.Price = rate.Price;
-                    await db.SaveChangesAsync();
+                    await repository.SaveAsync();
                     _logger.LogInformation($"CurrencyRate Updated:{currencyRate}");
                 }
             }

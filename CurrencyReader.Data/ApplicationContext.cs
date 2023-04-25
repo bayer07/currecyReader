@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
 namespace CurrencyReader.Data;
-public class ApplicationContext : DbContext
+internal class ApplicationContext : DbContext
 {
     public DbSet<Currency> Currencies => Set<Currency>();
     public DbSet<CurrencyRate> CurrencyRates => Set<CurrencyRate>();

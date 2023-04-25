@@ -1,4 +1,5 @@
 ﻿using CurrencyReader.Data;
+using CurrencyReader.Data.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.VisualBasic;
 
@@ -20,9 +21,9 @@ public class CurrencyController : ControllerBase
     {
         try
         {
-            using (var db = new ApplicationContext())
+            using (var repository = new ExchangeRepository())
             {
-                var currencies = db.Currencies.ToArray();
+                var currencies = repository.Currencies.ToArray();
                 return currencies;
             }
         }
@@ -38,9 +39,9 @@ public class CurrencyController : ControllerBase
     {
         try
         {
-            using (var db = new ApplicationContext())
+            using (var repository = new ExchangeRepository())
             {
-                var result = db.CurrencyRates
+                var result = repository.CurrencyRates
                     .Where(d => d.CurrencyId == currencyId)
                     .GroupBy(_ => 1, (_, records) => new SelectCurrencyModel
                     {
@@ -64,9 +65,9 @@ public class CurrencyController : ControllerBase
     {
         try
         {
-            using (var db = new ApplicationContext())
+            using (var repository = new ExchangeRepository())
             {
-                var result = db.CurrencyRates
+                var result = repository.CurrencyRates
                     .Where(d => d.CurrencyId == currencyId && d.Date > startDate && d.Date < endDate)
                     .ToList();
                 return result;
